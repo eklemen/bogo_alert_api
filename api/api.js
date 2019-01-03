@@ -43,11 +43,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // secure your private routes with jwt authentication middleware
-app.all('/private/*', (req, res, next) => auth(req, res, next));
+app.all('/api/*', (req, res, next) => auth(req, res, next));
 
 // fill routes for express application
 app.use('/public', mappedOpenRoutes);
-app.use('/private', mappedAuthRoutes);
+app.use('/api', mappedAuthRoutes);
 
 server.listen(config.port, () => {
   if (environment !== 'production' &&

@@ -5,23 +5,27 @@ const bcryptService = require('../services/bcrypt.service');
 const UserController = () => {
   const register = async (req, res) => {
     const { body } = req;
-
-    if (body.password === body.password2) {
-      try {
-        const user = await User.create({
+    console.log('------------\n\r', body);
+    if (!body.password || !body.email) {
+      return res.status(400).json({ msg: 'Bad Request: Must include email and password' });
+    }
+    try {
+      const user = await User.findOne({
+        where: { email: body.email },
+      });
+      if (!user) {
+        const newUser = await User.create({
           email: body.email,
           password: body.password,
         });
-        const token = authService().issue({ id: user.id });
+        const token = authService().issue({ id: newUser.id });
 
-        return res.status(200).json({ token, user });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ msg: 'Internal server error' });
+        return res.status(200).json({ token, user: newUser });
       }
+      return res.status(422).json({ msg: 'This email is already registered.' });
+    } catch (err) {
+      return res.status(500).json({ msg: 'Internal server error' });
     }
-
-    return res.status(400).json({ msg: 'Bad Request: Passwords don\'t match' });
   };
 
   const login = async (req, res) => {
@@ -53,7 +57,7 @@ const UserController = () => {
       }
     }
 
-    return res.status(400).json({ msg: 'Bad Request: Email or password is wrong' });
+    return res.status(400).json({ msg: 'Bad Request: Email or password is incorrect' });
   };
 
   const validate = (req, res) => {

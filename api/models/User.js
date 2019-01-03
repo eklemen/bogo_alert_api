@@ -15,11 +15,13 @@ const User = sequelize.define('User', {
   email: {
     type: Sequelize.STRING,
     unique: true,
+    required: true,
   },
   password: {
     type: Sequelize.STRING,
+    required: true,
   },
-}, { hooks, tableName });
+}, { hooks, tableName, underscored: true });
 
 // eslint-disable-next-line
 User.prototype.toJSON = function () {
